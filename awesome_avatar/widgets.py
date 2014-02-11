@@ -15,7 +15,12 @@ class AvatarWidget(FileInput):
         y1 = data.get(name + '-y1', 0)
         x2 = data.get(name + '-x2', x1)
         y2 = data.get(name + '-y2', y1)
-        ratio = float(data.get(name + '-ratio', 1))
+
+        ratio_str = data.get(name + '-ratio', 1)
+        if (ratio_str != ''):
+            ratio = float(ratio_str)
+        else:
+            ratio = 1.0
 
         box_raw = [x1, y1, x2, y2]
         box = []
@@ -42,8 +47,13 @@ class AvatarWidget(FileInput):
         context['name'] = name
         context['config'] = config
 
-        context['avatar_url'] = value.url if value else '/static/awesome_avatar/default.png'
+        if type(value) != dict:
+            context['avatar_url'] = value.url if value else '/static/awesome_avatar/default.png'
+        else:
+            context['avatar_url'] = '/static/awesome_avatar/default.png'
+
         context['id'] = attrs.get('id', 'id_' + name)
+
         # todo fix HACK
         context['STATIC_URL'] = settings.STATIC_URL
         return render_to_string('awesome_avatar/widget.html', context)
