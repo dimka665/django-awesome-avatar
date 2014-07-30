@@ -47,8 +47,17 @@ Add the ``AvatarField`` to your user or profile model::
         user = OneToOneField(User, related_name='profile')
         ...
         avatar = AvatarField(upload_to='avatars', width=100, height=100)
+        
+If you use South for migrations, you will have to tell South to introspect 
+the AvatarField. Add the following code above your user or profile model::
 
-Use model form usually way::
+    from south.modelsinspector import add_introspection_rules                        
+    add_introspection_rules([], ["^awesome_avatar\.fields\.AvatarField"])
+  
+
+Once you've extended the User or Profile model with the AvatarField,
+create a new ModelForm, and a view for the form to allow users to edit
+their Avatar::
 
     class AvatarChangeForm(ModelForm):
         class Meta:
