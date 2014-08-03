@@ -1,4 +1,6 @@
 import os
+import uuid
+
 from awesome_avatar.settings import config
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
@@ -50,7 +52,11 @@ class AvatarField(models.ImageField):
             content = StringIO()
             image.save(content, config.save_format, quality=config.save_quality)
 
-            file_name = u'{}.{}'.format(os.path.splitext(file_.name)[0], config.save_format)
+            file_name = u'{}-{}.{}'.format(
+                os.path.splitext(file_.name)[0],
+                str(uuid.uuid1()),
+                config.save_format
+            )
 
             # new_data = SimpleUploadedFile(file.name, content.getvalue(), content_type='image/' + config.save_format)
             new_data = InMemoryUploadedFile(content, None, file_name, 'image/' + config.save_format, len(content.getvalue()), None)
