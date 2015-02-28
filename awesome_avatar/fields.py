@@ -3,11 +3,15 @@ from awesome_avatar.settings import config
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
 from awesome_avatar import forms
+from awesome_avatar.widgets import AvatarWidget
 
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:  # python 3
+        from io import BytesIO as StringIO
 
 try:
     from PIL import Image
@@ -32,10 +36,16 @@ class AvatarField(models.ImageField):
         super(AvatarField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.AvatarField}
-        defaults['width'] = self.width
-        defaults['height'] = self.height
+        defaults = {
+            'form_class': forms.AvatarField,
+            'width': self.width,
+            'height': self.height,
+        }
         defaults.update(kwargs)
+
+        # django 1.7 fix default widget
+        if not defaults.get('widget') or not isinstance(defaults.get('widget'), AvatarWidget):
+            defaults['widget'] = AvatarWidget
         return super(AvatarField, self).formfield(**defaults)
 
     def save_form_data(self, instance, data):
@@ -43,15 +53,13 @@ class AvatarField(models.ImageField):
         file_ = data['file']
         if file_:
 
-            image = Image.open(StringIO(file_.read()))
+            image = Image.open(file_)
             image = image.crop(data['box'])
             image = image.resize((self.width, self.height), Image.ANTIALIAS)
 
-            content = StringIO()
-            image.save(content, config.save_format, quality=config.save_quality)
-
             file_name = u'{}.{}'.format(os.path.splitext(file_.name)[0], config.save_format)
+            new_data = InMemoryUploadedFile(StringIO(), None, file_name, 'image/' + config.save_format, 0, None)
 
-            # new_data = SimpleUploadedFile(file.name, content.getvalue(), content_type='image/' + config.save_format)
-            new_data = InMemoryUploadedFile(content, None, file_name, 'image/' + config.save_format, len(content.getvalue()), None)
+            image.save(new_data, config.save_format, quality=config.save_quality)
+
             super(AvatarField, self).save_form_data(instance, new_data)
