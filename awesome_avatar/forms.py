@@ -12,9 +12,6 @@ class AvatarField(forms.ImageField):
         self.height = defaults.pop('height', config.height)
         super(AvatarField, self).__init__(**defaults)
 
-    def to_python(self, data):
-        f = super().to_python(data)
-
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
         attrs['width'] = self.width
