@@ -4,7 +4,7 @@ from awesome_avatar.settings import config
 from awesome_avatar.widgets import AvatarWidget
 
 
-class AvatarField(forms.ImageField):
+class AvatarField(forms.FileField):
     widget = AvatarWidget
 
     def __init__(self, **defaults):
@@ -15,7 +15,6 @@ class AvatarField(forms.ImageField):
     def to_python(self, data):
         super(AvatarField, self).to_python(data['file'])
         return data
-
 
     def widget_attrs(self, widget):
         return {'width': self.width, 'height': self.height}
