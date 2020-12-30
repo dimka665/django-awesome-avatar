@@ -5,6 +5,8 @@ django-awesome-avatar
 Django-awesome-avatar is a reusable application providing Avatar model field.
 It allows crop selected area before saving image.
 
+Now supports python3.x / django3.x
+
 Purpose
 =======
 
