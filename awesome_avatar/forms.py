@@ -15,3 +15,9 @@ class AvatarField(forms.ImageField):
     def to_python(self, data):
         super(AvatarField, self).to_python(data['file'])
         return data
+
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        attrs.set('width', self.width)
+        attrs.set('height', self.height)
+        return attrs
