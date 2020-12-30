@@ -18,6 +18,6 @@ class AvatarField(forms.ImageField):
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
-        attrs.set('width', self.width)
-        attrs.set('height', self.height)
+        attrs['width'] = self.width
+        attrs['height'] = self.height
         return attrs
